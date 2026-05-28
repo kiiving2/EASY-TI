@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이지티아이(EASY TI) - 16가지 유형 최종완성본</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gamja+Flower&display=swap');
+
+        :root {
+            --primary-color: #2D6A4F;    /* 메인 초록색 */
+            --accent-color: #52B788;     /* 활성화 연초록 */
+            --bg-color: #F2F7F4;         /* 편안한 배경색 */
+            --text-color: #1B4332;
+            --card-bg: #FFFFFF;
+            --gray-light: #D8E2DC;
+        }
+
+        body {
+            font-family: 'Gowun Dodum', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* 📱 창 크기에 따라 자동으로 폭이 시원하게 늘어나는 반응형 콘테이너 */
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(45, 106, 79, 0.08);
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--gray-light);
+            padding-bottom: 25px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 36px;
+            margin: 0 0 10px 0;
+            font-family: 'Gamja Flower', sans-serif;
+        }
+
+        .page-purpose {
+            background-color: #E8F5E9;
+            color: var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            background-color: var(--gray-light);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* 현재 단계에서 푼 문항 비율에 맞춰 부드럽게 차오르는 진행바 */
+        .progress {
+            background-color: var(--accent-color);
+            width: 0%; 
+            height: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* 각 단계별 페이지 공간 (기본적으로 숨겨뒀다가 스크립트로 전환) */
+        .survey-step {
+            display: none;
+        }
+        .survey-step.active {
+            display: block;
+        }
+
+        .questions-list {
+            margin-bottom: 30px;
+        }
+
+        .question-card {
+            margin-bottom: 25px;
+            padding: 25px;
+            border-radius: 18px;
+            border: 2px solid #E2E8F0;
+            background-color: #FDFFFD;
+            transition: all 0.3s ease;
+        }
+
+        .question-card.answered {
+            background-color: #F8FAFC;
+            border-color: #E2E8F0;
+            opacity: 0.65;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .word-tooltip {
+            text-decoration: underline wavy var(--accent-color);
+            color: #157347;
+            font-weight: 800;
+            cursor: help;
+            display: inline-block;
+        }
+
+        /* 🎯 절대 화면 밖으로 안 잘리고 마우스를 졸졸 따라다니는 무적 말풍선 */
+        .fixed-tooltip {
+            display: none;
+            position: fixed;
+            width: 290px;
+            background-color: #2D6A4F;
+            color: #fff;
+            border-radius: 16px;
+            padding: 18px;
+            z-index: 9999;
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 1.6;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            pointer-events: none;
+        }
+
+        .tooltip-img-box {
+            font-size: 48px;
+            text-align: center;
+            display: block;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 8px 0;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            font-size: 17px;
+            font-weight: bold;
+            border: 2px solid var(--gray-light);
+            border-radius: 14px;
+            background-color: white;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        .btn:hover {
+            background-color: #E8F5E9;
+            border-color: var(--accent-color);
+        }
+
+        .btn.selected {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .nav-btn {
+            width: 100%;
+            padding: 18px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 19px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Gowun Dodum', sans-serif;
+            transition: background-color 0.2s;
+        }
+
+        .nav-btn:hover {
+            background-color: #1B4332;
+        }
+
+        /* 🏆 결과 화면 전용 애니메이션 스타일 */
+        .result-screen {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        .result-title-sub {
+            font-size: 22px;
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .result-title-main {
+            font-family: 'Gamja Flower', sans-serif;
+            font-size: 46px;
+            color: var(--primary-color);
+            margin: 0 0 25px 0;
+        }
+
+        .result-graphic {
+            font-size: 100px;
+            background-color: #F2F7F4;
+            border-radius: 50%;
+            width: 160px;
+            height: 160px;
+            line-height: 160px;
+            margin: 0 auto 30px auto;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .result-desc-box {
+            background-color: #F8FAFC;
+            border-radius: 18px;
+            padding: 25px;
+            text-align: left;
+            border: 2px solid var(--gray-light);
+            margin-bottom: 30px;
+        }
+
+        .result-desc-text {
+            font-size: 16px;
+            line-height: 1.9;
+            color: #2D3748;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="global-tooltip" class="fixed-tooltip"></div>
+
+    <div class="container">
+        
+        <div id="survey-header">
+            <div class="header">
+                <h1>이지티아이 (EASY TI)</h1>
+                <div class="page-purpose" id="page-step-title">🌱 1단계: 나의 '마음 에너지' 알아보기 (E/I)</div>
+                <div class="progress-bar"><div class="progress" id="progress-line"></div></div>
+            </div>
+        </div>
+
+        <div id="step-1" class="survey-step active">
+            <div class="questions-list">
+                <div class="question-card" id="q1-card">
+                    <div class="question-text">
+                        1. 새로운 사람들과 만나서 이야기하는 행동은 나에게 매우 
+                        <span class="word-tooltip" onmouseenter="showTip('😰🏃‍♂️❌', '뜻: 걱정이 가득 생겨서 마음이 무겁고 불편한 느낌이에요.<br>예시: 모르는 친구들이 잔뜩 있는 교실에 나 혼자 문을 열고 들어가야 할 때처럼 망설여지는 기분이에요.', event)" onmousemove="moveTip(event)" onmouseleave="hideTip()">부담스럽다</span>.
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(1, 'q1', 'I', this)">예</button>
+                        <button class="btn" onclick="selectOption(1, 'q1', 'E', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q2-card">
+                    <div class="question-text">
+                        2. 주말에 집에서 혼자 가만히 누워있으면 지루하고 조금 
+                        <span class="word-tooltip" onmouseenter="showTip('😢🌧️📉', '뜻: 슬프고 기분이 아래로 뚝 떨어져서 기운이 하나도 없는 상태예요.<br>예시: 놀이공원에 가기로 약속한 날 아침에 갑자기 비가 펑펑 와서 취소됐을 때의 속상한 기분이에요.', event)" onmousemove="moveTip(event)" onmouseleave="hideTip()">우울하다</span>.
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(1, 'q2', 'E', this)">예</button>
+                        <button class="btn" onclick="selectOption(1, 'q2', 'I', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q3-card">
+                    <div class="question-text">
+                        3. 학교나 모임에서 여러 사람 앞에 나가 
+                        <span class="word-tooltip" onmouseenter="showTip('🧑‍🏫🎤📢', '뜻: 내 생각이나 재미있는 이야기들을 많은 사람 앞에서 씩씩하게 들려주는 행동이에요.<br>예시: 칠판 앞에 서서 내가 가장 좋아하는 만화나 장난감을 친구들에게 큰 소리로 소개하는 시간이에요.', event)" onmousemove="moveTip(event)" onmouseleave="hideTip()">발표하는</span> 것은 즐겁다.
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(1, 'q3', 'E', this)">예</button>
+                        <button class="btn" onclick="selectOption(1, 'q3', 'I', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q4-card">
+                    <div class="question-text">
+                        4. 친구들과 신나게 놀고 집에 돌아오면 에너지가 
+                        <span class="word-tooltip" onmouseenter="showTip('🔋⚡💪', '뜻: 지치고 고갈됐던 기운이나 힘이 다시 100%로 가득 차오르는 상태예요.<br>예시: 멈춰버린 장난감 자동차에 새 건전지를 끼웠을 때 다시 쌩쌩하게 움직이는 것처럼 힘이 나는 거예요!', event)" onmousemove="moveTip(event)" onmouseleave="hideTip()">충전된</span> 것처럼 힘이 난다.
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(1, 'q4', 'E', this)">예</button>
+                        <button class="btn" onclick="selectOption(1, 'q4', 'I', this)">아니오</button>
+                    </div>
+                </div>
+            </div>
+            <button class="nav-btn" onclick="nextStep(1)">2단계로 넘어가기 ➔</button>
+        </div>
+
+        <div id="step-2" class="survey-step">
+            <div class="questions-list">
+                <div class="question-card" id="q5-card">
+                    <div class="question-text">
+                        5. 나는 눈앞에 없는 우주나 마법 세계를 떠올리며 혼자 
+                        <span class="word-tooltip" onmouseenter="showTip('🧙‍♂️✨🚀', '뜻: 머릿속으로 신기하고 재미있는 이야기를 눈앞에 그리듯 지어내는 생각이에요.<br>예시: 하늘을 날아다니는 고양이나 과자로 만든 집을 상상하며 노는 흥미진진한 생각이에요.', event)" onmousemove="moveTip(event)" onmouseleave="hideTip()">상상하는</span> 것을 엄청 좋아한다.
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(2, 'q5', 'N', this)">예</button>
+                        <button class="btn" onclick="selectOption(2, 'q5', 'S', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q6-card">
+                    <div class="question-text">
+                        6. 이야기를 들을 때 지어낸 동화보다 실제로 일어난 
+                        <span class="word-tooltip" onmouseenter="showTip('👁️🧱🔍', '뜻: 거짓말이나 상상이 아니고 눈앞에 진짜로 존재하거나 일어난 진짜 사실이에요.<br>예시: 옛날이야기 속 용의 이야기보다, 어제 뉴스에 나온 진짜 아기 호랑이 탄생 소식이 더 재밌는 것과 같아요.', event)" onmousemove="moveTip(event)" onmouseleave="hideTip()">현실적인</span> 이야기가 더 와닿는다.
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(2, 'q6', 'S', this)">예</button>
+                        <button class="btn" onclick="selectOption(2, 'q6', 'N', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q7-card">
+                    <div class="question-text">7. 장난감 조립 설명서를 보지 않고 내 마음대로 기발하게 조립하는 게 편하다.</div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(2, 'q7', 'N', this)">예</button>
+                        <button class="btn" onclick="selectOption(2, 'q7', 'S', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q8-card">
+                    <div class="question-text">8. 만약에 내가 하늘을 날 수 있다면? 과 같은 엉뚱한 질문을 자주 떠올린다.</div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(2, 'q8', 'N', this)">예</button>
+                        <button class="btn" onclick="selectOption(2, 'q8', 'S', this)">아니오</button>
+                    </div>
+                </div>
+            </div>
+            <button class="nav-btn" onclick="nextStep(2)">3단계로 넘어가기 ➔</button>
+        </div>
+
+        <div id="step-3" class="survey-step">
+            <div class="questions-list">
+                <div class="question-card" id="q9-card">
+                    <div class="question-text">
+                        9. 친구가 넘어져서 울고 있을 때, "왜 넘어졌어?"라는 질문보다 친구 마음 아픈 것에 
+                        <span class="word-tooltip" onmouseenter="showTip('💖🫂🥺', '뜻: 상대방의 기쁨이나 슬픈 마음을 나도 똑같이 따뜻하게 느껴주는 예쁜 마음이에요.<br>예시: 슬퍼서 우는 친구를 달래주며 같이 속상해하고 꼭 안아주는 다정다감한 기분이에요.', event)" onmousemove="moveTip(event)" onmouseleave="hideTip()">공감하는</span> 위로가 먼저 나온다.
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(3, 'q9', 'F', this)">예</button>
+                        <button class="btn" onclick="selectOption(3, 'q9', 'T', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q10-card">
+                    <div class="question-text">
+                        10. 문제가 생겼을 때 기분보다는 앞뒤 원인을 똑부러지게 따지는 
+                        <span class="word-tooltip" onmouseenter="showTip('🧐⚖️🧠', '뜻: 감정에 치우치지 않고 무엇이 맞고 틀린 지 차근차근 따져서 생각하는 태도예요.<br>예시: 간식을 나눌 때 누구랑 더 친한지 보지 않고, 모두가 똑같이 한 개씩 가질 수 있도록 똑똑하게 계산하는 일이에요.', event)" onmousemove="moveTip(event)" onmouseleave="hideTip()">논리적인</span> 해결책이 최고라고 생각한다.
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(3, 'q10', 'T', this)">예</button>
+                        <button class="btn" onclick="selectOption(3, 'q10', 'F', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q11-card">
+                    <div class="question-text">11. 영화나 만화를 볼 때 등장인물의 마음에 몰입해 눈물을 자주 흘리는 편이다.</div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(3, 'q11', 'F', this)">예</button>
+                        <button class="btn" onclick="selectOption(3, 'q11', 'T', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q12-card">
+                    <div class="question-text">12. 주변 친구들로부터 "너 참 따뜻하고 내 말 잘 들어준다"라는 칭찬을 많이 듣는다.</div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(3, 'q12', 'F', this)">예</button>
+                        <button class="btn" onclick="selectOption(3, 'q12', 'T', this)">아니오</button>
+                    </div>
+                </div>
+            </div>
+            <button class="nav-btn" onclick="nextStep(3)">4단계로 넘어가기 ➔</button>
+        </div>
+
+        <div id="step-4" class="survey-step">
+            <div class="questions-list">
+                <div class="question-card" id="q13-card">
+                    <div class="question-text">
+                        13. 여행을 가거나 방학을 시작할 때, 일기예보나 시간표를 미리 꼼꼼하게 
+                        <span class="word-tooltip" onmouseenter="showTip('📅✏️⏰', '뜻: 어떤 일을 하기 전에 미리 언제, 무엇을 할지 약속과 순서를 똑똑하게 정해두는 일이에요.<br>예시: 내일 몇 시에 일어나서 숙제를 하고 몇 시에 게임을 할지 수첩에 미리 적어두는 습관이에요.', event)" onmousemove="moveTip(event)" onmouseleave="hideTip()">계획적인</span> 순서대로 정해두어야 마음이 편하다.
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(4, 'q13', 'J', this)">예</button>
+                        <button class="btn" onclick="selectOption(4, 'q13', 'P', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q14-card">
+                    <div class="question-text">
+                        14. 무언가를 결정할 때 미리 정해두지 않고 그때그때 기분에 따라 
+                        <span class="word-tooltip" onmouseenter="showTip('🏄‍♂️🎈🎨', '뜻: 미리 짜둔 계획 없이 마음이 끌리는 대로 자유롭고 즐겁게 행동하는 모양이에요.<br>예시: 놀이터에 갈 계획이 없었지만 창밖 날씨가 너무 좋아 보여서 신발을 신고 바로 뛰어나가는 행동이에요.', event)" onmousemove="moveTip(event)" onmouseleave="hideTip()">즉흥적인</span> 선택을 내리는 게 훨씬 짜릿하고 즐겁다.
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(4, 'q14', 'P', this)">예</button>
+                        <button class="btn" onclick="selectOption(4, 'q14', 'J', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q15-card">
+                    <div class="question-text">15. 방 정리를 하거나 장난감을 제자리에 각 잡고 똑바로 두는 것을 좋아한다.</div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(4, 'q15', 'J', this)">예</button>
+                        <button class="btn" onclick="selectOption(4, 'q15', 'P', this)">아니오</button>
+                    </div>
+                </div>
+                <div class="question-card" id="q16-card">
+                    <div class="question-text">16. 숙제나 과제 기한이 닥쳤을 때 막판에 집중력을 확 발휘해서 끝내는 편이다.</div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="selectOption(4, 'q16', 'P', this)">예</button>
+                        <button class="btn" onclick="selectOption(4, 'q16', 'J', this)">아니오</button>
+                    </div>
+                </div>
+            </div>
+            <button class="nav-btn" onclick="showFinalResult()">✨ 완벽한 나의 MBTI 결과 보러 가기 ➔</button>
+        </div>
+
+        <div id="result-page" class="result-screen">
+            <div class="result-title-sub" id="res-sub">성격 유형 분석 결과</div>
+            <h1 class="result-title-main" id="res-main">분석 중...</h1>
+            <div class="result-graphic" id="res-icon">⚙️</div>
+            <div class="result-desc-box">
+                <div class="result-desc-text" id="res-desc">
+                    여기에 최종 매칭된 성격 유형 설명서가 등장합니다.
+                </div>
+            </div>
+            <button class="nav-btn" style="background-color: #52B788;" onclick="window.location.reload()">다시 처음부터 검사하기 ↻</button>
+        </div>
+
+    </div>
+
+    <script>
+        // 사용자가 누른 값을 누적하는 데이터베이스 저장소
+        let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+        // 현재 어떤 질문이 풀렸는지 기록 (진행바 계산용)
+        let answersChecked = { q1:null, q2:null, q3:null, q4:null, q5:null, q6:null, q7:null, q8:null, q9:null, q10:null, q11:null, q12:null, q13:null, q14:null, q15:null, q16:null };
+        
+        const tooltip = document.getElementById('global-tooltip');
+
+        // 16가지 성격 유형 백과사전 정의 (예은님 팀의 요구분석서 기반 확장)
+        const mbtiLibrary = {
+            "ISTP": { title: "백방의 손재주꾼, 장인", sub: "현실 세계의 대담한 탐험가", icon: "🛠️⚙️🏎️", desc: "호기심 가득한 탐험가 유형이에요! 혼자 무언가를 조립하거나 관찰할 때 최고의 집중력을 발휘해요. 실용적인 논리와 높은 적응력으로 남들이 생각하지 못한 뚝딱뚝딱 신기한 해결책을 찾아내는 발명가랍니다." },
+            "ISFP": { title: "호기심 많은 예술가", sub: "성인군자형 다정한 예술가", icon: "🎨🖌️🐱", desc: "말없이 다정하고 온화한 성격을 가졌어요. 예술이나 디자인처럼 아름다운 것을 좋아하며, 주변 친구들의 감정을 조용히 배려해주고 따뜻한 위로를 건네주는 평화주의자 어린이입니다." },
+            "ISTJ": { title: "청렴결백한 논리주의자", sub: "올바르고 책임감 강한 모범생", icon: "📅📝🎒", desc: "한 번 맡은 일은 끝까지 완벽하게 해내는 책임감 대장이에요. 정해진 규칙과 약속을 아주 잘 지키며, 주변 정리정돈도 척척 해내는 신뢰 가득하고 우직한 성격입니다." },
+            "ISFJ": { title: "용감한 수호자", sub: "주변을 소중히 챙기는 돌봄이", icon: "🧸💖🛡️", desc: "친구들과 가족들을 조용히 챙겨주는 마음 따뜻한 수호자예요. 남을 돕는 일에서 보람을 느끼며, 겉으로는 조용해 보이지만 책임감이 아주 강하고 따뜻한 마음씨를 품고 있습니다." },
+            "INFP": { title: "열정적인 중재자", sub: "마음속 깊이 꿈이 가득한 시인", icon: "🦄📔🌟", desc: "상상력이 풍부하고 마음이 아주 깊은 동화 속 주인공 같은 친구예요. 다른 사람들의 아픔에 누구보다 깊이 공감하고, 나만의 비밀 일기장에 아름다운 생각과 꿈을 예쁘게 간직해두는 다정한 아이입니다." },
+            "INFJ": { title: "선의의 옹호자", sub: "조용히 세상을 바꾸는 지혜로운 리더", icon: "🔮🦉🌱", desc: "생각이 깊고 어른스러운 신비로운 친구예요. 친구들의 마음을 꿰뚫어 보듯 잘 알아채며, 모두가 사이좋게 지낼 수 있는 평화롭고 멋진 세상을 마음속으로 조용히 꿈꾸는 따뜻한 전략가입니다." },
+            "INTP": { title: "논리적인 사색가", sub: "생각이 멈추지 않는 꼬마 과학자", icon: "🧪🧬💻", desc: "세상 모든 원리를 궁금해하는 똑똑한 탐구가 유형이에요. 조용히 생각에 잠겨 흥미진진한 이론을 연구하거나 버그를 고치고 퍼즐을 맞추는 것처럼 복잡한 문제를 풀어낼 때 가장 신나하는 천재 기질이 있어요." },
+            "INTJ": { title: "용의주도한 전략가", sub: "앞을 내다보는 마인드맵 마스터", icon: "♟️🎯🧠", desc: "목표를 세우면 한 걸음 한 걸음 똑똑하게 계획을 세워 달성해내는 전략가예요! 독립심이 아주 강하고 논리적이어서 어떠한 어려운 숙제나 문제가 닥쳐도 씩씩하게 헤쳐 나가는 브레인이랍니다." },
+            "ESTP": { title: "수완 좋은 활동가", sub: "에너지 뿜뿜 행동파 탐험가", icon: "🛹🔥🏆", desc: "한시도 가만히 있지 않는 에너자이저! 친구들 사이에서 골목대장처럼 활발하게 놀고, 새로운 게임이나 거침없는 도전을 마주했을 때 몸으로 부딪쳐 빠르게 정복하는 멋진 행동대장 어린이입니다." },
+            "ESFP": { title: "자유로운 영혼의 연예인", sub: "주변을 환하게 밝히는 인간 비타민", icon: "🎤✨🎉", desc: "가는 곳마다 웃음꽃을 피우는 파티의 주인공이에요! 춤추고 노래하며 친구들을 웃겨주는 것을 가장 좋아하고, 오늘 하루를 가장 신나고 시끌벅적하게 보내는 천하무적 긍정 왕이랍니다." },
+            "ESTJ": { title: "엄격한 관리자", sub: "체계적이고 정의로운 학생회장", icon: "📢⚖️👮", desc: "공동체 생활에서 반장이나 조장을 맡아 친구들을 멋지게 이끄는 타고난 대장이에요! 계획을 세워 규칙적으로 움직이는 것을 제일 좋아하고, 공정하고 올바른 결정을 뚝딱 내리는 지휘관입니다." },
+            "ESFJ": { title: "사교적인 외교관", sub: "칭찬과 배려가 몸에 밴 다정 대장", icon: "🍪🍰💌", desc: "친구들을 우리 집에 초대해서 맛있는 과자를 나눠 먹으며 수다 떠는 것을 가장 행복해하는 마당발 친구예요. 누구에게나 먼저 다가가 친절을 베풀고 최고의 리액션으로 반 분위기를 훈훈하게 만들어 줍니다." },
+            "ENFP": { title: "재기발랄한 활동가", sub: "매일매일 아이디어가 터지는 스파크", icon: "🎈🌈🥳", desc: "머릿속이 번뜩이는 상상력과 흥미진진한 호기심으로 가득 차 있는 친구예요. 처음 본 친구와도 1초 만에 단짝이 될 만큼 활발하며, 즉흥적이고 창의적인 장난을 끊임없이 만들어내어 주변을 행복하게 해줍니다." },
+            "ENFJ": { title: "정의로운 사회운동가", sub: "모두를 이끄는 따뜻한 태양 리더", icon: "☀️🤝🌻", desc: "친구들을 하나로 똘똘 뭉치게 만드는 다정한 영웅 유형이에요. 말 한마디도 예쁘게 건네며 상처받은 친구를 위로해주고, 언제나 앞장서서 친구들을 행복한 길로 인도하는 멋진 리더십을 가졌습니다." },
+            "ENTP": { title: "뜨거운 논쟁을 즐기는 변론가", sub: "아이디어가 샘솟는 기발한 악동", icon: "💡🛸🥊", desc: "질문하기를 엄청 좋아하고 고정관념을 깨부수는 것을 즐기는 꼬마 발명가예요! 토론할 때 엉뚱하면서도 논리적인 주장을 펼쳐 어른들을 깜짝 놀라게 만들고, 기발한 도전을 끊임없이 시도하는 모험가입니다." },
+            "ENTJ": { title: "대담한 통솔자", sub: "어떠한 성벽도 무너뜨리는 최고 사령관", icon: "👑⚔️🗺️", desc: "강한 의지와 똑똑한 두뇌로 무리를 통솔하는 카리스마 넘치는 리더예요. 어려운 도전을 만날수록 눈빛이 초롱초롱해지며, 미래를 완벽하게 계획하여 성공을 이끌어내는 자신감 넘치는 멋쟁이입니다." }
+        };
+
+        // 📊 [기능 고정] 풀린 개수를 정밀하게 계산해 진행바를 실시간 갱신하는 함수
+        function updateProgressBar() {
+            const total = Object.keys(answersChecked).length;
+            const currentChecked = Object.values(answersChecked).filter(v => v !== null).length;
+            const percent = (currentChecked / total) * 100;
+            document.getElementById('progress-line').style.width = percent + '%';
+        }
+
+        // [기능 고정] 선택 시 초록색 하이라이트 및 데이터 기록 처리
+        function selectOption(stepNum, qId, mbtiValue, element) {
+            const buttons = element.parentElement.querySelectorAll('.btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+
+            answersChecked[qId] = mbtiValue;
+            document.getElementById(`${qId}-card`).classList.add('answered');
+            updateProgressBar();
+        }
+
+        // 🔀 각 4개의 페이지 단계를 부드럽게 넘겨주는 로직 (미체크 방지 포함)
+        function nextStep(currentStep) {
+            let startQ = (currentStep - 1) * 4 + 1;
+            let endQ = currentStep * 4;
+            let checkUnanswered = false;
+
+            for(let i = startQ; i <= endQ; i++) {
+                if(answersChecked[`q${i}`] === null) {
+                    checkUnanswered = true;
+                }
+            }
+
+            if(checkUnanswered) {
+                alert("아직 답변을 고르지 않은 질문이 있습니다. 모든 문항에 예쁜 답변을 채워주세요! 📋");
+                return;
+            }
+
+            // 팝업 없이 그 자리에서 부드럽게 다음 화면으로 교체
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            
+            let next = currentStep + 1;
+            document.getElementById(`step-${next}`).classList.add('active');
+
+            // 상단 단계 안내 타이틀 교체
+            const titles = [
+                "",
+                "🌱 1단계: 나의 '마음 에너지' 알아보기 (E/I)",
+                "🔍 2단계: 내가 정보를 받아들이는 방법 (S/N)",
+                "💖 3단계: 어떤 방법으로 결정을 내릴까? (T/F)",
+                "⏰ 4단계: 나는 어떤 모습으로 생활할까? (J/P)"
+            ];
+            document.getElementById('page-step-title').innerText = titles[next];
+            window.scrollTo(0,0);
+        }
+
+        // 🎯 [핵심] 사용자가 누른 예/아니오 데이터들을 조합하여 최종 성격 유형을 추출하는 연산기
+        function showFinalResult() {
+            // 4단계 검증
+            for(let i = 13; i <= 16; i++) {
+                if(answersChecked[`q${i}`] === null) {
+                    alert("마지막 단계의 질문들이 아직 채워지지 않았어요! 📋");
+                    return;
+                }
+            }
+
+            // 전역 스코어 점수 초기화 후 다시 계산
+            scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            Object.values(answersChecked).forEach(val => {
+                if(val) scores[val]++;
+            });
+
+            // 점수가 높은 알파벳끼리 결합하여 최종 4글자 유형 추출
+            let finalMbti = "";
+            finalMbti += (scores.E >= scores.I) ? "E" : "I";
+            finalMbti += (scores.S >= scores.N) ? "S" : "N";
+            finalMbti += (scores.T >= scores.F) ? "T" : "F";
+            finalMbti += (scores.J >= scores.P) ? "J" : "P";
+
+            // 질문지와 상단 헤더 영역을 싹 감춘 뒤 결과창 오픈
+            document.getElementById('survey-header').style.display = 'none';
+            document.getElementById('step-4').style.display = 'none';
+            
+            // 데이터 매칭하여 화면에 주입
+            const userResult = mbtiLibrary[finalMbti];
+            document.getElementById('res-main').innerText = `${userResult.title} (${finalMbti})`;
+            document.getElementById('res-sub').innerText = userResult.sub;
+            document.getElementById('res-icon').innerText = userResult.icon;
+            document.getElementById('res-desc').innerHTML = `<b>★ 예은님의 검사 결과 분석서:</b><br><br>${userResult.desc}`;
+            
+            document.getElementById('result-page').style.display = 'block';
+            window.scrollTo(0,0);
+        }
+
+        // 🛠️ [기능 고정] 마우스 위치를 정밀 추적해 절대 안 깨지게 말풍선을 띄우는 안전 함수
+        function showTip(imgHtml, textHtml, event) {
+            tooltip.innerHTML = `<span class="tooltip-img-box">${imgHtml}</span>${textHtml}`;
+            tooltip.style.display = 'block';
+            moveTip(event);
+        }
+
+        function moveTip(event) {
+            const offsetMouseX = event.clientX + 15;
+            const offsetMouseY = event.clientY + 15;
+            
+            if (offsetMouseX + 310 > window.innerWidth) {
+                tooltip.style.left = (event.clientX - 310) + 'px';
+            } else {
+                tooltip.style.left = offsetMouseX + 'px';
+            }
+            tooltip.style.top = offsetMouseY + 'px';
+        }
+
+        function hideTip() {
+            tooltip.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
